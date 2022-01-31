@@ -1,0 +1,6 @@
+D:\Novo OBF\Challenge\bin\Debug\Challenge.exe
+D:\Novo OBF\Challenge\bin\Debug\Challenge.pdb
+D:\Novo OBF\Challenge\obj\Debug\Challenge.csproj.AssemblyReference.cache
+D:\Novo OBF\Challenge\obj\Debug\Challenge.csproj.CoreCompileInputs.cache
+D:\Novo OBF\Challenge\obj\Debug\Challenge.exe
+D:\Novo OBF\Challenge\obj\Debug\Challenge.pdb
