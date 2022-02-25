@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -101,38 +101,45 @@ namespace FVM.Protections.VM
 					cli.Variables.Add(locf);
 				}
 			}
-			int outp = 0;
-			cli.Instructions.Add(new Instruction(OpCodes.Ldc_I4, meth.Parameters.Count));
-			cli.Instructions.Add(new Instruction(OpCodes.Newarr, module.CorLibTypes.Object.ToTypeDefOrRef()));
-			for (int j = 0; j < meth.Parameters.Count; j++)
-			{
-				Parameter par = meth.Parameters[j];
-				cli.Instructions.Add(new Instruction(OpCodes.Dup));
-				cli.Instructions.Add(new Instruction(OpCodes.Ldc_I4, j));
-				bool flag3 = containsOut;
-				if (flag3)
+			if(meth.Parameters.Count > 0)
+            {
+				int outp = 0;
+				cli.Instructions.Add(new Instruction(OpCodes.Ldc_I4, meth.Parameters.Count));
+				cli.Instructions.Add(new Instruction(OpCodes.Newarr, module.CorLibTypes.Object.ToTypeDefOrRef()));
+				for (int j = 0; j < meth.Parameters.Count; j++)
 				{
-					bool flag4 = rrr.Contains(meth.Parameters[j]);
-					if (flag4)
+					Parameter par = meth.Parameters[j];
+					cli.Instructions.Add(new Instruction(OpCodes.Dup));
+					cli.Instructions.Add(new Instruction(OpCodes.Ldc_I4, j));
+					bool flag3 = containsOut;
+					if (flag3)
 					{
-						cli.Instructions.Add(new Instruction(OpCodes.Ldloc, testerDictionary[meth.Parameters[j]]));
-						outp++;
+						bool flag4 = rrr.Contains(meth.Parameters[j]);
+						if (flag4)
+						{
+							cli.Instructions.Add(new Instruction(OpCodes.Ldloc, testerDictionary[meth.Parameters[j]]));
+							outp++;
+						}
+						else
+						{
+							cli.Instructions.Add(new Instruction(OpCodes.Ldarg, meth.Parameters[j]));
+						}
 					}
 					else
 					{
 						cli.Instructions.Add(new Instruction(OpCodes.Ldarg, meth.Parameters[j]));
 					}
+					cli.Instructions.Add(par.Type.FullName.EndsWith("&") ? new Instruction(OpCodes.Box, par.Type.Next.ToTypeDefOrRef()) : new Instruction(OpCodes.Box, par.Type.ToTypeDefOrRef()));
+					cli.Instructions.Add(new Instruction(OpCodes.Stelem_Ref));
 				}
-				else
-				{
-					cli.Instructions.Add(new Instruction(OpCodes.Ldarg, meth.Parameters[j]));
-				}
-				cli.Instructions.Add(par.Type.FullName.EndsWith("&") ? new Instruction(OpCodes.Box, par.Type.Next.ToTypeDefOrRef()) : new Instruction(OpCodes.Box, par.Type.ToTypeDefOrRef()));
-				cli.Instructions.Add(new Instruction(OpCodes.Stelem_Ref));
+				cli.Instructions.Add(new Instruction(OpCodes.Stloc, loc2));
+				cli.Instructions.Add(new Instruction(OpCodes.Ldc_I4, pos));
+				cli.Instructions.Add(new Instruction(OpCodes.Ldloc, loc2));
+			} else
+            {
+				cli.Instructions.Add(new Instruction(OpCodes.Ldc_I4, pos));
+				cli.Instructions.Add(new Instruction(OpCodes.Ldnull));				
 			}
-			cli.Instructions.Add(new Instruction(OpCodes.Stloc, loc2));
-			cli.Instructions.Add(new Instruction(OpCodes.Ldc_I4, pos));
-			cli.Instructions.Add(new Instruction(OpCodes.Ldloc, loc2));
 			cli.Instructions.Add(Instruction.Create(OpCodes.Call, executeCall));
 			bool flag5 = meth.ReturnType.ElementType == ElementType.Void;
 			if (flag5)
